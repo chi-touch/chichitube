@@ -2,15 +2,13 @@ package com.media.chichitube.controllers;
 
 
 import com.media.chichitube.dtos.requests.UploadMediaRequest;
+import com.media.chichitube.models.Media;
 import com.media.chichitube.services.MediaService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -27,6 +25,11 @@ public class MediaController {
     public ResponseEntity<?> uploadMedia(@ModelAttribute UploadMediaRequest uploadMediaRequest){
         return ResponseEntity.status(CREATED)
                 .body(mediaService.upload(uploadMediaRequest));
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getMediaForUser(@RequestParam Long userId){
+       return ResponseEntity.ok(mediaService.getMediaFor(userId));
     }
 
 }

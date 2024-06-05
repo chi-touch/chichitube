@@ -12,6 +12,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockPart;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
@@ -19,6 +20,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static com.media.chichitube.utils.TestUtils.TEST_VIDEO_LOCATION;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -52,4 +55,23 @@ public class MediaControllerTest {
 //            assertThat(exception).isNull();
         }
     }
+
+    @Test
+    public void testGetMediaForUser(){
+
+        try {
+            mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/media?userId=200")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().is2xxSuccessful())
+                    .andDo(print());
+        }catch (Exception exception){
+            assertThat(exception).isNull();
+
+
+
+
+        }
+    }
+
+
 }
