@@ -9,6 +9,7 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.media.chichitube.dtos.requests.UpdateMediaRequest;
 import com.media.chichitube.dtos.requests.UploadMediaRequest;
+import com.media.chichitube.dtos.responses.MediaResponse;
 import com.media.chichitube.dtos.responses.UpdateMediaResponse;
 import com.media.chichitube.dtos.responses.UploadMediaResponse;
 import com.media.chichitube.exceptions.MediaNotFoundException;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -113,6 +115,16 @@ public class MavericksHubMediaServices  implements MediaService{
        }
 
     }
+
+    @Override
+    public List<MediaResponse> getMediaFor(Long userId) {
+        List<Media> media = mediaRepository.findAllMediaFor(userId);
+        return media.stream()
+                .map(mediaItem ->modelMapper.map(mediaItem, MediaResponse.class))
+                .toList();
+    }
+
+
 
 
 }
