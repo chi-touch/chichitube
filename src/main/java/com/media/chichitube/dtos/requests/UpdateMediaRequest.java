@@ -13,7 +13,8 @@ import lombok.Setter;
 public class UpdateMediaRequest {
 
     @Id
-    private Long userid;
+    private Long id;
+    private String description;
     private Category uploader;
 
 }

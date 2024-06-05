@@ -3,9 +3,16 @@ package com.media.chichitube.services;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Uploader;
 import com.cloudinary.utils.ObjectUtils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
+import com.media.chichitube.dtos.requests.UpdateMediaRequest;
 import com.media.chichitube.dtos.requests.UploadMediaRequest;
+import com.media.chichitube.dtos.responses.UpdateMediaResponse;
 import com.media.chichitube.dtos.responses.UploadMediaResponse;
 import com.media.chichitube.exceptions.MediaNotFoundException;
+import com.media.chichitube.exceptions.MediaUpdateException;
 import com.media.chichitube.exceptions.MediaUploadFailedException;
 import com.media.chichitube.models.Media;
 import com.media.chichitube.models.User;
@@ -83,7 +90,29 @@ public class MavericksHubMediaServices  implements MediaService{
 
     }
 
+    @Override
+    public UpdateMediaResponse update(Long mediaId,
+                                      JsonPatch updateMediaRequest) {
+       try {
+           // 1. get target objecta
+           Media media = getMediaBy(mediaId);
+          // 2. convert object from above to JsonNode (use ObjectMapper)
+           ObjectMapper objectMapper = new ObjectMapper();
+           JsonNode mediaNode = objectMapper.convertValue(media, JsonNode.class);
+          // 3. apply jsonPatch to mediaNode
+           mediaNode = updateMediaRequest.apply(mediaNode);
 
+          // 4. convert mediaNode to Media object;
+           media = objectMapper.convertValue(media, Media.class);
+           media = mediaRepository.save(media);
+
+           return modelMapper.map(media,UpdateMediaResponse.class);
+       }catch (JsonPatchException exception){
+           throw new MediaUpdateException(exception.getMessage());
+
+       }
+
+    }
 
 
 }

@@ -1,10 +1,20 @@
 package com.media.chichitube.services;
 
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.github.fge.jackson.jsonpointer.JsonPointer;
+import com.github.fge.jackson.jsonpointer.JsonPointerException;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchOperation;
+import com.github.fge.jsonpatch.ReplaceOperation;
+import com.media.chichitube.dtos.requests.CreateUserRequest;
+import com.media.chichitube.dtos.requests.UpdateMediaRequest;
 import com.media.chichitube.dtos.requests.UploadMediaRequest;
+import com.media.chichitube.dtos.responses.UpdateMediaResponse;
 import com.media.chichitube.dtos.responses.UploadMediaResponse;
 import com.media.chichitube.models.Category;
 import com.media.chichitube.models.Media;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,9 +27,11 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
-import static com.media.chichitube.models.Category.ACTION;
+import static com.media.chichitube.models.Category.*;
 import static com.media.chichitube.utils.TestUtils.TEST_VIDEO_LOCATION;
+import static com.media.chichitube.utils.TestUtils.buildUploadMediaRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -67,23 +79,39 @@ public class MediaServiceTest {
         }
     }
 
-    private static UploadMediaRequest buildUploadMediaRequest(InputStream inputStream) throws IOException {
-        UploadMediaRequest request = new UploadMediaRequest();
-        MultipartFile file = new MockMultipartFile("media",inputStream);
-        request.setMediaFile(file);
-        request.setCategory(ACTION);
-        request.setUserId(201L);
 
-        return request;
-
-    }
 
     @Test
-
     public void getMediaById(){
         Media media = mediaService.getMediaBy(1001L);
         log.info("found content ->{}",media);
         assertThat(media).isNotNull();
+    }
+
+    @Test
+    @DisplayName("test update media files")
+    public void testPartialUpdateMedia() throws JsonPointerException {
+
+        Category category = mediaService.getMediaBy(1002L).getCategory();
+        assertThat(category).isNotEqualTo(DRAMA);
+
+//        UpdateMediaRequest updateMediaRequest = new UpdateMediaRequest();
+//        updateMediaRequest.setUploader(STEP_MOM);
+
+
+        List<JsonPatchOperation> operations = List.of(
+                new ReplaceOperation(new JsonPointer("/category"), new TextNode(STEP_MOM.name()))
+        );
+        JsonPatch  updateMediaRequest= new JsonPatch(operations);
+//        updateMediaRequest.setDescription("testing 123...");
+       UpdateMediaResponse response = mediaService.update(1002L,
+               updateMediaRequest);
+       assertThat(response).isNotNull();
+
+       category = mediaService.getMediaBy(1002L).getCategory();
+       assertThat(category).isEqualTo(STEP_MOM);
+
+
     }
 
 

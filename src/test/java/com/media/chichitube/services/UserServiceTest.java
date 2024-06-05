@@ -61,17 +61,7 @@ public class UserServiceTest {
     }
 
 
-    @Test
-    public void testUpdateMediaFileCategory(){
 
-        CreateUserRequest request = new CreateUserRequest();
-        request.setEmail("chi@gmail.com");
-        request.setPassword("password");
-        userService.register(request);
-
-        UpdateMediaRequest mediaRequest = new UpdateMediaRequest();
-//        mediaRequest.
-    }
 
 
 }
