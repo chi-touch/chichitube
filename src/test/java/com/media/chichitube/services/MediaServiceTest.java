@@ -9,6 +9,7 @@ import com.github.fge.jsonpatch.ReplaceOperation;
 import com.media.chichitube.dtos.requests.CreateUserRequest;
 import com.media.chichitube.dtos.requests.UpdateMediaRequest;
 import com.media.chichitube.dtos.requests.UploadMediaRequest;
+import com.media.chichitube.dtos.responses.MediaResponse;
 import com.media.chichitube.dtos.responses.UpdateMediaResponse;
 import com.media.chichitube.dtos.responses.UploadMediaResponse;
 import com.media.chichitube.models.Category;
@@ -111,6 +112,15 @@ public class MediaServiceTest {
        category = mediaService.getMediaBy(1002L).getCategory();
        assertThat(category).isEqualTo(STEP_MOM);
 
+
+    }
+
+    @Test
+    public void getMediaForUserTest(){
+        Long userId = 200L;
+        List<MediaResponse>media = mediaService.getMediaFor(userId);
+        log.info("media item -> {}",media);
+        assertThat(media).hasSize(4);
 
     }
 
