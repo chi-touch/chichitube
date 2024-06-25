@@ -2,6 +2,8 @@ package com.media.chichitube.controllers;
 
 
 import com.media.chichitube.dtos.requests.UploadMediaRequest;
+import com.media.chichitube.exceptions.MediaHubBaseException;
+import com.media.chichitube.exceptions.UserNotFoundException;
 import com.media.chichitube.models.Media;
 import com.media.chichitube.services.MediaService;
 import lombok.AllArgsConstructor;
@@ -22,13 +24,13 @@ public class MediaController {
 
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<?> uploadMedia(@ModelAttribute UploadMediaRequest uploadMediaRequest){
+    public ResponseEntity<?> uploadMedia(@ModelAttribute UploadMediaRequest uploadMediaRequest) throws UserNotFoundException {
         return ResponseEntity.status(CREATED)
                 .body(mediaService.upload(uploadMediaRequest));
     }
 
     @GetMapping
-    public ResponseEntity<?> getMediaForUser(@RequestParam Long userId){
+    public ResponseEntity<?> getMediaForUser(@RequestParam Long userId) throws MediaHubBaseException {
        return ResponseEntity.ok(mediaService.getMediaFor(userId));
     }
 

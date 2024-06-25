@@ -1,5 +1,6 @@
 package com.media.chichitube.respositories;
 
+import com.media.chichitube.exceptions.MediaHubBaseException;
 import com.media.chichitube.models.Media;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ class MediaRepositoryTest {
     private MediaRepository mediaRepository;
 
     @Test
-    public void findAllMediaFor(){
+    public void findAllMediaFor() throws MediaHubBaseException {
         List<Media> media = mediaRepository.findAllMediaFor(200L);
         log.info("item->{}",media);
         assertThat(media)

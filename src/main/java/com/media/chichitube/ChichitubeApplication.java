@@ -10,4 +10,5 @@ public class ChichitubeApplication {
 		SpringApplication.run(ChichitubeApplication.class, args);
 	}
 
+
 }

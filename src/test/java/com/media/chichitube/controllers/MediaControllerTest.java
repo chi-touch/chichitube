@@ -40,7 +40,8 @@ public class MediaControllerTest {
         try(InputStream inputStream = Files.newInputStream(Path.of(TEST_VIDEO_LOCATION))) {//            mockMvc.perform(post("/api/v1/media")
             MultipartFile file = new MockMultipartFile("mediaFile",inputStream);
              mockMvc.perform(multipart("/api/v1/media")
-                      .file(file.getName(),file.getBytes())
+                      .file("mediaFile",file.getBytes()) //or
+//                             .file(file.getName(),file.getBytes())
                       .part(new MockPart("userId","200".getBytes()))
                       .part(new MockPart("description","test description".getBytes()))
                       .part(new MockPart("category","ACTION".getBytes()))
@@ -67,8 +68,19 @@ public class MediaControllerTest {
         }catch (Exception exception){
             assertThat(exception).isNull();
 
+        }
+    }
 
+    @Test
+    public void testGetMediaForUserShouldFailForInvalidUserId(){
 
+        try {
+            mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/media?userId=200")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest())
+                    .andDo(print());
+        }catch (Exception exception){
+            assertThat(exception).isNull();
 
         }
     }

@@ -7,14 +7,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
-import com.media.chichitube.dtos.requests.UpdateMediaRequest;
 import com.media.chichitube.dtos.requests.UploadMediaRequest;
 import com.media.chichitube.dtos.responses.MediaResponse;
 import com.media.chichitube.dtos.responses.UpdateMediaResponse;
 import com.media.chichitube.dtos.responses.UploadMediaResponse;
-import com.media.chichitube.exceptions.MediaNotFoundException;
-import com.media.chichitube.exceptions.MediaUpdateException;
-import com.media.chichitube.exceptions.MediaUploadFailedException;
+import com.media.chichitube.exceptions.*;
 import com.media.chichitube.models.Media;
 import com.media.chichitube.models.User;
 import com.media.chichitube.respositories.MediaRepository;
@@ -45,7 +42,7 @@ public class MavericksHubMediaServices  implements MediaService{
     private final ModelMapper modelMapper;
     private final UserService userService;
     @Override
-    public UploadMediaResponse upload(UploadMediaRequest request){
+    public UploadMediaResponse upload(UploadMediaRequest request) throws UserNotFoundException {
         User user = userService.getById(request.getUserId());
         try {
 
@@ -93,13 +90,14 @@ public class MavericksHubMediaServices  implements MediaService{
     }
 
     @Override
-    public UpdateMediaResponse update(Long mediaId,
+    public UpdateMediaResponse updateMedia(Long mediaId,
                                       JsonPatch updateMediaRequest) {
        try {
            // 1. get target objecta
            Media media = getMediaBy(mediaId);
           // 2. convert object from above to JsonNode (use ObjectMapper)
            ObjectMapper objectMapper = new ObjectMapper();
+           //ObjectMapper convert the media into a JsonNode
            JsonNode mediaNode = objectMapper.convertValue(media, JsonNode.class);
           // 3. apply jsonPatch to mediaNode
            mediaNode = updateMediaRequest.apply(mediaNode);
@@ -117,7 +115,8 @@ public class MavericksHubMediaServices  implements MediaService{
     }
 
     @Override
-    public List<MediaResponse> getMediaFor(Long userId) {
+    public List<MediaResponse> getMediaFor(Long userId) throws MediaHubBaseException {
+        userService.getById(userId);
         List<Media> media = mediaRepository.findAllMediaFor(userId);
         return media.stream()
                 .map(mediaItem ->modelMapper.map(mediaItem, MediaResponse.class))

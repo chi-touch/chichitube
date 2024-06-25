@@ -12,6 +12,8 @@ import com.media.chichitube.dtos.requests.UploadMediaRequest;
 import com.media.chichitube.dtos.responses.MediaResponse;
 import com.media.chichitube.dtos.responses.UpdateMediaResponse;
 import com.media.chichitube.dtos.responses.UploadMediaResponse;
+import com.media.chichitube.exceptions.MediaHubBaseException;
+import com.media.chichitube.exceptions.UserNotFoundException;
 import com.media.chichitube.models.Category;
 import com.media.chichitube.models.Media;
 import lombok.extern.slf4j.Slf4j;
@@ -54,12 +56,15 @@ public class MediaServiceTest {
             UploadMediaRequest request = new UploadMediaRequest();
             MultipartFile file = new MockMultipartFile("photographer", inputStream);
             request.setMediaFile(file);
+            request.setUserId(200L);
             UploadMediaResponse uploadResponse = mediaService.upload(request);
 
             assertThat(uploadResponse).isNotNull();
             assertThat(uploadResponse.getUrl()).isNotNull();
         }catch (IOException exception) {
             assertThat(exception).isNull();
+        } catch (UserNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -77,6 +82,8 @@ public class MediaServiceTest {
 
         } catch (IOException e) {
             assertThat(e).isNotNull();
+        } catch (UserNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -105,7 +112,7 @@ public class MediaServiceTest {
         );
         JsonPatch  updateMediaRequest= new JsonPatch(operations);
 //        updateMediaRequest.setDescription("testing 123...");
-       UpdateMediaResponse response = mediaService.update(1002L,
+       UpdateMediaResponse response = mediaService.updateMedia(1002L,
                updateMediaRequest);
        assertThat(response).isNotNull();
 
@@ -116,7 +123,7 @@ public class MediaServiceTest {
     }
 
     @Test
-    public void getMediaForUserTest(){
+    public void getMediaForUserTest() throws MediaHubBaseException {
         Long userId = 200L;
         List<MediaResponse>media = mediaService.getMediaFor(userId);
         log.info("media item -> {}",media);
