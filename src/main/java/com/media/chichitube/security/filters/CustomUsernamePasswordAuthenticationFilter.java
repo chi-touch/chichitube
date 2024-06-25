@@ -1,5 +1,7 @@
 package com.media.chichitube.security.filters;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.media.chichitube.dtos.requests.LoginRequest;
 import jakarta.servlet.FilterChain;
@@ -12,6 +14,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -20,6 +23,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Date;
 
 @Component
 @AllArgsConstructor
@@ -64,7 +72,18 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
                                             HttpServletResponse response,
                                             FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
+      String  token = JWT.create()
+                .withIssuer("chichi_tube")
+                .withArrayClaim("roles",getClaimsFrom(authResult.getAuthorities()))
+                .withExpiresAt(Instant.now().plusSeconds(24 * 60 * 60))
+                .sign(Algorithm.HMAC512("secret"));
 
+    }
+
+    private static String[] getClaimsFrom(Collection<? extends GrantedAuthority> authorities){
+        return authorities.stream()
+                .map((grantedAuthority)-> grantedAuthority.getAuthority())
+                .toArray(String[]:: new);
     }
 
     @Override
