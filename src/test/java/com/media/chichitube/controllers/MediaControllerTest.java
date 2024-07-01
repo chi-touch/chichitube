@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockPart;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -29,12 +30,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@WithMockUser(authorities = {"USER"})
 @Sql(scripts = {"/db/data.sql"})
 public class MediaControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
     @Test
+
     public void testUploadMedia() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         try(InputStream inputStream = Files.newInputStream(Path.of(TEST_VIDEO_LOCATION))) {//            mockMvc.perform(post("/api/v1/media")
@@ -75,7 +78,7 @@ public class MediaControllerTest {
     public void testGetMediaForUserShouldFailForInvalidUserId(){
 
         try {
-            mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/media?userId=200")
+            mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/media?userId=2000")
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isBadRequest())
                     .andDo(print());

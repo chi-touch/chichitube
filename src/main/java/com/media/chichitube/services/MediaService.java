@@ -22,5 +22,5 @@ public interface MediaService {
 
   UpdateMediaResponse updateMedia(Long mediaId,  JsonPatch updateMediaRequest);
 
-    List<MediaResponse> getMediaFor(Long userId) throws MediaHubBaseException;
+    List<MediaResponse> getMediaFor(Long userId) throws UserNotFoundException;
 }

@@ -115,7 +115,7 @@ public class MavericksHubMediaServices  implements MediaService{
     }
 
     @Override
-    public List<MediaResponse> getMediaFor(Long userId) throws MediaHubBaseException {
+    public List<MediaResponse> getMediaFor(Long userId) throws UserNotFoundException{
         userService.getById(userId);
         List<Media> media = mediaRepository.findAllMediaFor(userId);
         return media.stream()

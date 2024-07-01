@@ -30,7 +30,7 @@ public class MediaController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getMediaForUser(@RequestParam Long userId) throws MediaHubBaseException {
+    public ResponseEntity<?> getMediaForUser(@RequestParam Long userId) throws UserNotFoundException {
        return ResponseEntity.ok(mediaService.getMediaFor(userId));
     }
 
