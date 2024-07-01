@@ -1,10 +1,10 @@
 truncate table users cascade;
 truncate table media cascade;
 insert into users(id,email,password,time_created)values
-(200,'john@gmail.com','password','2024-06-04T15:03:03.792009700'),
-(201,'johny@gmail.com','password','2024-06-04T15:03:03.792009700'),
-(202,'johni@gmail.com','password','2024-06-04T15:03:03.792009700'),
-(203,'johnp@gmail.com','password','2024-06-04T15:03:03.792009700');
+(200,'john@gmail.com','$2a$10$un669mJjWOkeNgfiRcVRT..r7BmpjTjfNw5pT/v5C7EJrABu/o0YS','2024-06-04T15:03:03.792009700'),
+(201,'johny@gmail.com','$2a$10$un669mJjWOkeNgfiRcVRT..r7BmpjTjfNw5pT/v5C7EJrABu/o0YS','2024-06-04T15:03:03.792009700'),
+(202,'johni@gmail.com','$2a$10$un669mJjWOkeNgfiRcVRT..r7BmpjTjfNw5pT/v5C7EJrABu/o0YS','2024-06-04T15:03:03.792009700'),
+(203,'johnp@gmail.com','$2a$10$un669mJjWOkeNgfiRcVRT..r7BmpjTjfNw5pT/v5C7EJrABu/o0YS','2024-06-04T15:03:03.792009700');
 
 
 insert into media(id,category,description,url,time_created,uploader_id) values

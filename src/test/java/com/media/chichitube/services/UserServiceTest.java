@@ -27,7 +27,7 @@ public class UserServiceTest {
     @Test
     public void testToRegisterUser(){
         CreateUserRequest request = new CreateUserRequest();
-        request.setEmail("chi@gmail.com");
+        request.setEmail("chiy@gmail.com");
         request.setPassword("password");
 
 

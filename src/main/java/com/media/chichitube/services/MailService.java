@@ -1,6 +1,8 @@
 package com.media.chichitube.services;
 
+import com.media.chichitube.dtos.SendMailRequest;
+
 public interface MailService {
 
-    String sendMail(String  email);
+    String sendMail(SendMailRequest request);
 }
