@@ -4,11 +4,14 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.media.chichitube.dtos.requests.LoginRequest;
+import com.media.chichitube.dtos.responses.BaseResponses;
+import com.media.chichitube.dtos.responses.LoginResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,8 +31,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
-@Component
+
 @AllArgsConstructor
 public class CustomUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -37,10 +42,11 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
 
 
     private final AuthenticationManager authenticationManager;
+    private final ObjectMapper mapper = new ObjectMapper();
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) throws AuthenticationException {
-        ObjectMapper mapper = new ObjectMapper();
+
         try {
             //1. Retrieve authentication credentials fro the request body
            InputStream requestBodyStream = request.getInputStream();
@@ -60,9 +66,14 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
             return authenticationResult;
 
        }catch (IOException exception){
-            throw new BadCredentialsException(exception..getMessage());
+            throw new BadCredentialsException(exception.getMessage());
 
         }
+
+
+
+
+
 
 
     }
@@ -72,11 +83,26 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
                                             HttpServletResponse response,
                                             FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
-      String  token = JWT.create()
-                .withIssuer("chichi_tube")
-                .withArrayClaim("roles",getClaimsFrom(authResult.getAuthorities()))
-                .withExpiresAt(Instant.now().plusSeconds(24 * 60 * 60))
-                .sign(Algorithm.HMAC512("secret"));
+      LoginResponse loginResponse = new LoginResponse();
+      loginResponse.setToken(generateAccessToken(authResult));
+      loginResponse.setMessage("Succesful Authentication");
+      BaseResponses<LoginResponse> authResponses = new BaseResponses<>();
+      authResponses.setCode(HttpStatus.OK.value());
+      authResponses.setData(loginResponse);
+      authResponses.setStatus(true);
+
+        response.getOutputStream().write(mapper.writeValueAsBytes(authResponses));
+        response.flushBuffer();
+        chain.doFilter(request,response);
+    }
+
+    private static String generateAccessToken(Authentication authResult) {
+       return JWT.create()
+                  .withIssuer("chichi_tube")
+                  .withArrayClaim("roles",
+                          getClaimsFrom(authResult.getAuthorities()))
+                  .withExpiresAt(Instant.now().plusSeconds(24 * 60 * 60))
+                  .sign(Algorithm.HMAC512("secret"));
 
     }
 
@@ -87,7 +113,23 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
     }
 
     @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+    protected void unsuccessfulAuthentication(HttpServletRequest request,
+                                              HttpServletResponse response,
+                                              AuthenticationException exception) throws IOException, ServletException {
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.setMessage(exception.getMessage());
+        BaseResponses<LoginResponse>baseResponses = new BaseResponses<>();
+        baseResponses.setData(loginResponse);
+        baseResponses.setStatus(false);
+        baseResponses.setCode(HttpStatus.UNAUTHORIZED.value());
+
+        response.getOutputStream().write(mapper.writeValueAsBytes(baseResponses));
+
+        response.flushBuffer();
+
 
     }
+
+
+
 }
