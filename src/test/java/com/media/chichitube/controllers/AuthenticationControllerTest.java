@@ -35,4 +35,19 @@ public class AuthenticationControllerTest {
                 .andDo(print());
 
     }
+
+
+    @Test
+    public void testThatAuthenticationFailsForIncorrectCredentials() throws Exception {
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setUsername("john@gmail.com");
+        loginRequest.setPassword("passwordgh");
+        ObjectMapper objectMapper = new ObjectMapper();
+        mockMvc.perform(post("/api/v1/auth")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(loginRequest)))
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
+
+    }
 }

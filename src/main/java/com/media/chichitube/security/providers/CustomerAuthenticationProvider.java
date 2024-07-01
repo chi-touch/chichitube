@@ -30,6 +30,7 @@ public class CustomerAuthenticationProvider implements AuthenticationProvider {
            return authenticationResult;
        }
 
+
         throw new BadCredentialsException("please supply valid authentication credentials");
     }
 
